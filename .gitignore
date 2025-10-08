@@ -174,3 +174,4 @@ pom.xml.next
  .idea/modules.xml
  .idea/*.iml
  .idea/modules
+/allure-results/
