@@ -175,3 +175,13 @@ pom.xml.next
  .idea/*.iml
  .idea/modules
 /allure-results/
+/.run/
+/.mvn/
+
+# Allure
+target/allure-results/
+target/site/
+.allure/
+
+# Dependency Check
+dependency-check-report.html

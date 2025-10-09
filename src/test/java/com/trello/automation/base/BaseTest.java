@@ -24,8 +24,7 @@ public class BaseTest {
         // TODO: Add any cleanup if necessary
     }
 
-
-    protected void testCreateBoard() {
-        // TODO: Add test flow here
+    protected void performSimpleRun() {
+        responseFieldsValidationSteps.validateCorrectResponse();
     }
 }

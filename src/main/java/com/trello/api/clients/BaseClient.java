@@ -13,19 +13,30 @@ import java.util.Map;
 public abstract class BaseClient {
 
     protected final RequestSpecification requestSpec;
-    protected final Config config;
+
+    private static final String BASE_URL = "https://api.trello.com";
+    private static final String API_KEY_ENV = "TRELLO_API_KEY";
+    private static final String API_TOKEN_ENV = "TRELLO_API_TOKEN";
 
     protected BaseClient() {
-        this.config = Config.getInstance();
         this.requestSpec = buildRequestSpecification();
     }
 
     private RequestSpecification buildRequestSpecification() {
+        String apiKey = System.getenv(API_KEY_ENV);
+        String apiToken = System.getenv(API_TOKEN_ENV);
+
+        if (apiKey == null || apiToken == null) {
+            log.error("Missing one or more required environment variables: {}, {}",
+                    API_KEY_ENV, API_TOKEN_ENV);
+            throw new IllegalStateException("Missing Trello API configuration environment variables.");
+        }
+
         return new RequestSpecBuilder()
-                .setBaseUri(config.getBaseUrl())
+                .setBaseUri(BASE_URL)
                 .setContentType(ContentType.JSON)
-                .addQueryParam("key", config.getApiKey())
-                .addQueryParam("token", config.getApiToken())
+                .addQueryParam("key", apiKey)
+                .addQueryParam("token", apiToken)
                 .build();
     }
 
