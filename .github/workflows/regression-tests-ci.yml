@@ -148,17 +148,35 @@ jobs:
           path: target/site/allure-maven-plugin/
           retention-days: 30
 
+      # In the 'report' job...
+      - name: Prepare Allure History
+        if: always()
+        run: |
+          # Change path here
+          mkdir -p target/allure-report/allure-history
+          if [ -d "target/allure-report/history" ]; then
+            cp -r target/allure-report/history/* target/allure-report/allure-history/
+          fi
+
+      - name: Upload Allure Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          # Change path here
+          path: target/allure-report/
+          retention-days: 30
+
       # Setup GitHub Pages
       - name: Setup Pages
         if: always()
         uses: actions/configure-pages@v4
 
-      # Upload to GitHub Pages
       - name: Upload to GitHub Pages
         if: always()
         uses: actions/upload-pages-artifact@v3
         with:
-          path: target/site/allure-maven-plugin/
+          path: target/allure-report/
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
