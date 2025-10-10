@@ -2,23 +2,18 @@ name: Trello API Test Automation CI
 
 on:
   schedule:
-    # Runs nightly at 22:00 UTC (23:00 Warsaw winter, 00:00 summer)
     - cron: '0 22 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub UI
-
-# Required for GitHub Pages deployment
+  workflow_dispatch:
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Job 1: Security Scan (runs in parallel with tests)
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -46,7 +41,6 @@ jobs:
           path: target/dependency-check-report.html
           retention-days: 30
 
-  # Job 2: Test Execution (runs in parallel with security scan)
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -76,7 +70,6 @@ jobs:
           path: target/surefire-reports/
           retention-days: 30
 
-      # Upload allure-results for the report generation job
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -85,12 +78,15 @@ jobs:
           path: target/allure-results/
           retention-days: 1
 
-  # Job 3: Generate and Deploy Report (runs after tests complete)
   report:
     name: Generate & Publish Report
     runs-on: ubuntu-latest
     needs: test
     if: always()
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout code
@@ -103,14 +99,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # Download test results from previous job
       - name: Download Allure Results
         uses: actions/download-artifact@v4
         with:
           name: allure-results
           path: target/allure-results/
 
-      # Get previous report history from GitHub Pages
       - name: Get Allure History
         uses: actions/checkout@v4
         if: always()
@@ -139,7 +133,6 @@ jobs:
             cp -r target/site/allure-maven-plugin/history/* target/site/allure-maven-plugin/allure-history/
           fi
 
-      # Upload as artifact (backup)
       - name: Upload Allure Report Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -177,9 +170,13 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: target/allure-report/
-
-      # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         if: always()
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Print Deployed URL to Summary
+        if: always()
+        run: |
+          echo "### 🚀 Allure Report successfully deployed!" >> $GITHUB_STEP_SUMMARY
+          echo "👉 **[Click here to view the report](${{ steps.deployment.outputs.page_url }})**" >> $GITHUB_STEP_SUMMARY
