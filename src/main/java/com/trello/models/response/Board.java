@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 public class Board {
     private String id;
     private String name;
+    private String desc;
     private String url;
 }

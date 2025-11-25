@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum BoardEndpoints {
     BOARDS("/1/boards"),
     GET_BOARD("/1/boards/{id}"),
+    UPDATE_BOARD("/1/boards/{id}"),
     CREATE_BOARD("/1/boards"),
     DELETE_BOARD("/1/boards/{id}"),
 

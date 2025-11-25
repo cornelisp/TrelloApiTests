@@ -12,11 +12,10 @@ import java.util.Map;
 @Slf4j
 public abstract class BaseClient {
 
-    protected final RequestSpecification requestSpec;
-
     private static final String BASE_URL = "https://api.trello.com";
     private static final String API_KEY_ENV = "TRELLO_API_KEY";
     private static final String API_TOKEN_ENV = "TRELLO_API_TOKEN";
+    protected final RequestSpecification requestSpec;
 
     protected BaseClient() {
         this.requestSpec = buildRequestSpecification();
@@ -44,6 +43,7 @@ public abstract class BaseClient {
         log.debug("GET request to: {} with path params: {}", endpoint, pathParams);
         return RestAssured.given()
                 .spec(requestSpec)
+                .log().all()
                 .pathParams(pathParams)
                 .get(endpoint);
     }
@@ -60,8 +60,26 @@ public abstract class BaseClient {
         log.debug("POST request to: {} with path params: {} and query params: {}", endpoint, pathParams, queryParams);
         return RestAssured.given()
                 .spec(requestSpec)
+                .log().all()
                 .pathParams(pathParams)
                 .queryParams(queryParams)
                 .post(endpoint);
+    }
+
+    protected Response delete(String endpoint, Map<String, String> pathParams) {
+        log.debug("DELETE request to: {} with path params: {}", endpoint, pathParams);
+        return RestAssured.given()
+                .spec(requestSpec)
+                .pathParams(pathParams)
+                .delete(endpoint);
+    }
+
+    protected Response put(String endpoint, Map<String, String> pathParams, Map<String, String> queryParams) {
+        log.debug("PUT request to: {} with path params: {} and query params: {}", endpoint, pathParams, queryParams);
+        return RestAssured.given()
+                .spec(requestSpec)
+                .pathParams(pathParams)
+                .queryParams(queryParams)
+                .put(endpoint);
     }
 }
