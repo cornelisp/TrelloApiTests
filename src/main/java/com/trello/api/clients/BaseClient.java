@@ -43,7 +43,7 @@ public abstract class BaseClient {
         log.debug("GET request to: {} with path params: {}", endpoint, pathParams);
         return RestAssured.given()
                 .spec(requestSpec)
-                .log().all()
+                //.log().all()
                 .pathParams(pathParams)
                 .get(endpoint);
     }
@@ -60,7 +60,7 @@ public abstract class BaseClient {
         log.debug("POST request to: {} with path params: {} and query params: {}", endpoint, pathParams, queryParams);
         return RestAssured.given()
                 .spec(requestSpec)
-                .log().all()
+                //.log().all()
                 .pathParams(pathParams)
                 .queryParams(queryParams)
                 .post(endpoint);
