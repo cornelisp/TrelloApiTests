@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: '0 22 * * *'
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
@@ -113,25 +114,16 @@ jobs:
           ref: gh-pages
           path: gh-pages
 
-      - name: Copy Allure History
+      - name: Copy History to Results
         if: always()
-        continue-on-error: true
         run: |
-          if [ -d "gh-pages/allure-history" ]; then
+          if [ -d "gh-pages/history" ]; then
             mkdir -p target/allure-results/history
-            cp -r gh-pages/allure-history/* target/allure-results/history/
+            cp -r gh-pages/history/* target/allure-results/history/
           fi
 
       - name: Generate Allure Report
         run: mvn allure:report
-
-      - name: Prepare Allure History
-        if: always()
-        run: |
-          mkdir -p target/site/allure-maven-plugin/allure-history
-          if [ -d "target/site/allure-maven-plugin/history" ]; then
-            cp -r target/site/allure-maven-plugin/history/* target/site/allure-maven-plugin/allure-history/
-          fi
 
       - name: Upload Allure Report Artifact
         if: always()
@@ -141,26 +133,6 @@ jobs:
           path: target/site/allure-maven-plugin/
           retention-days: 30
 
-      # In the 'report' job...
-      - name: Prepare Allure History
-        if: always()
-        run: |
-          # Change path here
-          mkdir -p target/allure-report/allure-history
-          if [ -d "target/allure-report/history" ]; then
-            cp -r target/allure-report/history/* target/allure-report/allure-history/
-          fi
-
-      - name: Upload Allure Report Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report
-          # Change path here
-          path: target/allure-report/
-          retention-days: 30
-
-      # Setup GitHub Pages
       - name: Setup Pages
         if: always()
         uses: actions/configure-pages@v4
@@ -169,7 +141,8 @@ jobs:
         if: always()
         uses: actions/upload-pages-artifact@v3
         with:
-          path: target/allure-report/
+          path: target/site/allure-maven-plugin/
+
       - name: Deploy to GitHub Pages
         if: always()
         id: deployment
