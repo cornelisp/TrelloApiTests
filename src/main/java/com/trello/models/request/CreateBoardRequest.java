@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetBoardRequest {
-    // --- Path parameter ---
-    private String id;
+public class CreateBoardRequest {
 
-    // --- Query parameters ---
     private String name;
+
 }
