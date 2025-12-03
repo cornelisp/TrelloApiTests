@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -58,22 +58,40 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: allure-results
-          path: build/allure-results
+          path: target/allure-results
+
+      - name: Checkout Old History
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: old-pages
+
+      - name: Copy History
+        if: always()
+        run: |
+          mkdir -p target/allure-results/history
+          if [ -d "old-pages/history" ]; then
+            echo "Copying history..."
+            cp -r old-pages/history/* target/allure-results/history/
+          else
+            echo "No history found (first run?)"
+          fi
 
       - name: Generate Allure Report
         uses: simple-elf/allure-report-action@master
         if: always()
-        id: allure-report
         with:
-          allure_results: build/allure-results
-          gh_pages: gh-pages
+          allure_results: target/allure-results
           allure_report: allure-report
-          allure_history: allure-history
 
+      # 5. Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
+          publish_dir: allure-report
+          keep_files: true
