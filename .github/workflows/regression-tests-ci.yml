@@ -9,9 +9,6 @@ permissions:
   contents: write
 
 jobs:
-  # ----------------------------------------
-  # JOB 1: RUN TESTS
-  # ----------------------------------------
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -41,9 +38,6 @@ jobs:
           path: target/allure-results/
           retention-days: 1
 
-  # ----------------------------------------
-  # JOB 2: GENERATE REPORT WITH HISTORY
-  # ----------------------------------------
   report:
     name: Generate & Publish Report
     runs-on: ubuntu-latest
@@ -66,17 +60,14 @@ jobs:
         continue-on-error: true
         with:
           ref: gh-pages
-          path: old-pages
+          path: gh-pages-dir
 
       - name: Copy History
         if: always()
         run: |
           mkdir -p target/allure-results/history
-          if [ -d "old-pages/history" ]; then
-            echo "Copying history..."
-            cp -r old-pages/history/* target/allure-results/history/
-          else
-            echo "No history found (first run?)"
+          if [ -d "gh-pages-dir/history" ]; then
+            cp -r gh-pages-dir/history/* target/allure-results/history/
           fi
 
       - name: Generate Allure Report
@@ -86,12 +77,21 @@ jobs:
           allure_results: target/allure-results
           allure_report: allure-report
 
-      # 5. Deploy to GitHub Pages
+      - name: Organize Report Structure
+        if: always()
+        run: |
+          # Create directory for the current run
+          mkdir -p gh-pages-dir/${{ github.run_number }}
+          cp -r allure-report/* gh-pages-dir/${{ github.run_number }}/
+          
+          # Update the latest report at root (so the main URL works)
+          cp -r allure-report/* gh-pages-dir/
+
       - name: Deploy to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-report
+          publish_dir: gh-pages-dir
           keep_files: true
