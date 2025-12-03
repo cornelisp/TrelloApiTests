@@ -62,10 +62,11 @@ jobs:
           ref: gh-pages
           path: gh-pages-dir
 
-      - name: Copy History
+      - name: Restore History
         if: always()
         run: |
           mkdir -p target/allure-results/history
+          # We check if history exists in the checked-out pages and copy it
           if [ -d "gh-pages-dir/history" ]; then
             cp -r gh-pages-dir/history/* target/allure-results/history/
           fi
@@ -77,15 +78,19 @@ jobs:
           allure_results: target/allure-results
           allure_report: allure-report
 
-      - name: Organize Report Structure
+      - name: Update History and Archive
         if: always()
         run: |
-          # Create directory for the current run
+          # A. Create the unique run folder (e.g. /81/)
           mkdir -p gh-pages-dir/${{ github.run_number }}
           cp -r allure-report/* gh-pages-dir/${{ github.run_number }}/
           
-          # Update the latest report at root (so the main URL works)
+          # B. Update the root folder (for main link)
           cp -r allure-report/* gh-pages-dir/
+          
+          # C. EXPLICITLY ensure history folder is updated at root for next runs
+          mkdir -p gh-pages-dir/history
+          cp -r allure-report/history/* gh-pages-dir/history/
 
       - name: Deploy to GitHub Pages
         if: always()
