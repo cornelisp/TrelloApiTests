@@ -19,7 +19,6 @@ This project demonstrates a **production-grade API test automation framework** f
 *  **Automated Test Data Cleanup** - Smart resource management with retry logic
 *  **Rich Allure Reporting** - Step-by-step execution logs with historical trends
 *  **Enterprise CI/CD** - Nightly scheduled runs with GitHub Actions
-*  **Security Best Practices** - OWASP dependency scanning included
 *  **Test History Tracking** - Visualize test stability over time via GitHub Pages
 
 ### 🛠 Tech Stack
